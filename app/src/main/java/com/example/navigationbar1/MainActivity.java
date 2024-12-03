@@ -2,8 +2,11 @@ package com.example.navigationbar1;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
+import android.widget.FrameLayout;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -16,6 +19,9 @@ import com.example.navigationbar1.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
+    private BottomNavigationView bottomNavigationView;
+    private FrameLayout frameLayout;
+
 
 
 
@@ -24,25 +30,46 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
-        bottomNavigationView.setSelectedItemId(R.id.Home);
+        bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        frameLayout = findViewById(R.id.frame_layout);
 
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.Home) {
-                return true;
-            }else if (itemId == R.id.Settings) {
-                startActivity(new Intent(getApplicationContext() , SettingsActivity.class));
-                overridePendingTransition(R.anim.slide_in_right,R.anim.slide_out_left);
-                finish();
-                return true;
-            }else if (itemId == R.id.Profile) {
-                startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
-                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                finish();
+
+
+
+        bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int itemId = item.getItemId();
+
+                if (itemId == R.id.Home) {
+                    loadFragment(new HomeFragment(),false);
+
+                } else if (itemId == R.id.Settings) {
+                    loadFragment(new SettingsFragment(),false);
+
+                } else {
+                    loadFragment(new ProfileFragment(),false);
+
+                }
+
                 return true;
             }
-            return false;
         });
+
+
+
+
+    }
+    private void loadFragment(Fragment fragment,boolean isAppInitized){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        if (isAppInitized) {
+            fragmentTransaction.add(R.id.frame_layout , fragment);
+        }else {
+            fragmentTransaction.replace(R.id.frame_layout , fragment);
+        }
+
+
+        fragmentTransaction.commit();
     }
 }
